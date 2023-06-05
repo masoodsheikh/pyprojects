@@ -12,12 +12,48 @@ class account_type(models.Model):
 
     def __str__(self) :
         return self.account_type_name
+    
 class main_account(models.Model):
     account_type = models.ForeignKey(account_type, on_delete=models.CASCADE, related_name='main')
     main_acount_name = models.CharField(max_length=100)
 
     def __str__(self) :
         return self.main_acount_name
+
+from django.db import models
+from django.utils import timezone
+
+class SubAccount(models.Model):
+    sub_account_name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100)
+    phone1 = models.CharField(max_length=15)
+    phone2 = models.CharField(max_length=15)
+    customer_website = models.CharField(max_length=100)
+    opening_balance = models.IntegerField()
+    main_account = models.ForeignKey('main_account', on_delete=models.CASCADE, null=True, blank=True, related_name='customer_account')
+
+    def __str__(self) :
+        return self.sub_account_name
+
+    def save(self, *args, **kwargs):
+        is_credit = True  # Default to credit
+        if self.opening_balance < 0:
+            is_credit = False  # Set as debit if the opening balance is negative
+
+        super().save(*args, **kwargs)
+
+        # Create a ledger entry for the opening balance
+        Ledger.objects.create(
+            account=self,
+            date=timezone.now(),
+            ref_no='Opening Balance',
+            type='Credit' if self.opening_balance > 0 else 'Debit',
+            description='Opening Balance',
+            credit=self.opening_balance if self.opening_balance > 0 else 0,
+            debit=self.opening_balance if not self.opening_balance > 0 else 0
+        )
 
 
 class Customer(models.Model):
@@ -90,19 +126,23 @@ class Voucher(models.Model):
     voucher_description = models.CharField(max_length=200)
 
 class VoucherDetail(models.Model):
-    account = models.ForeignKey(main_account, on_delete=models.CASCADE, related_name='detail')
+    account = models.ForeignKey(SubAccount, on_delete=models.CASCADE, related_name='detail')
     description = models.CharField(max_length=200)
     credit = models.DecimalField(max_digits=15, decimal_places=2)
     debit = models.DecimalField(max_digits=15, decimal_places=2)
 
 class Ledger(models.Model):
-    account = models.ForeignKey(main_account, on_delete=models.CASCADE, related_name='ledger')
+    account = models.ForeignKey(SubAccount, on_delete=models.CASCADE, related_name='ledger')
     date = models.DateTimeField(default=timezone.now)
     ref_no = models.CharField(max_length=20)
     type = models.CharField(max_length=10)
     description = models.CharField(max_length=200)
     credit = models.DecimalField(max_digits=15, decimal_places=2)
     debit = models.DecimalField(max_digits=15, decimal_places=2)
+
+    def __str__(self) :
+        return self.type
+
 
 class Inventory(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='inventory_product', null=True, blank=True)

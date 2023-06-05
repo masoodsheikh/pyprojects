@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .forms import MainAccountForm, SubAccountForm
 
 def home(request):
     return render(request, 'myapp/index.html')
@@ -55,3 +56,33 @@ def register(request):
             return redirect('register')
     
     return render(request, 'myapp/register.html')
+
+
+
+
+def add_main_account(request):
+    if request.method == 'POST':
+        form = MainAccountForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account Successfully Added!")
+            return redirect('add_account')
+    else:
+        form = MainAccountForm()
+        return render(request, 'myapp/add_account.html', {'form': form})
+    
+    return render(request, 'myapp/add_account.html', {'form': form})
+
+def add_sub_account(request):
+    form=SubAccountForm()
+    if request.method == 'POST':
+        form = SubAccountForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account Successfully Added!")
+            return redirect('add_sub_account')
+        else:
+            form = SubAccountForm()
+            return render(request, 'myapp/add_sub_account.html', {'form': form})
+    
+    return render(request, 'myapp/add_sub_account.html', {'form': form})

@@ -1,0 +1,36 @@
+      {% extends 'myapp/base.html' %}
+
+      {% block content %}
+      
+      <br>
+      <br>
+      {% if user.is_authenticated %}
+        <div class="col-md-6 offset-md-3">
+        <form method="POST" action="" class="form-control">
+            {% csrf_token %}
+    
+            <table>
+                <tr>
+                    <td><label class="form-label" for="{{ form.account_type.id_for_label }}">Account Type:</label></td>
+                    <td><div >{{ form.account_type }}</div></td>
+                </tr>
+                <tr>
+                    <td><label class="form-label" for="{{ form.main_acount_name.id_for_label }}">Main Account Name:</label></td>
+                    <td><div >{{ form.main_acount_name }}</div></td>
+                </tr>
+                
+                <tr>
+                    <td>
+                    <td><div ><button type="submit" class="btn btn-primary">Save Account</button> </div></td>
+                </tr>
+            </table>
+            
+            
+        </form>
+    </div>
+     {% else %}
+     <div class="col-md-6 offset-md-3">
+        <a class="btn btn-primary" type="submit" aria-current="page" href="{% url 'login' %}"> Your are not Logged-in, Login first to perform this task.</a>
+      </div>  
+     {% endif %}
+            {% endblock %}

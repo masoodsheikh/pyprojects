@@ -1,0 +1,68 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+
+<br>
+<br>
+{% if user.is_authenticated %}
+  <div >
+    <h2> Sub Accounts</h2>
+  <form method="POST" action="" class="form-control">
+      {% csrf_token %}
+
+      <table>
+          <tr>
+              <td><label class="form-label" for="{{ form.main_account.id_for_label }}">Choose Main Account</label></td>
+              <td><div >{{ form.main_account }}</div></td>
+          
+          
+              <td><label class="form-label" for="{{ form.main_acount_name.id_for_label }}">Sub Account Name</label></td>
+              <td><div >{{ form.sub_account_name }}</div></td>
+          </tr>
+          <tr>
+            <td><label class="form-label" for="{{ form.address.id_for_label }}">Address</label></td>
+            <td><div >{{ form.address }}</div></td>
+        
+        
+            <td><label class="form-label" for="{{ form.city.id_for_label }}">City</label></td>
+            <td><div >{{ form.city }}</div></td>
+        </tr>
+        <tr>
+            <td><label class="form-label" for="{{ form.email.id_for_label }}">Email</label></td>
+            <td><div >{{ form.email }}</div></td>
+        
+        
+            <td><label class="form-label" for="{{ form.phone1.id_for_label }}">Phone # 1</label></td>
+            <td><div >{{ form.phone1 }}</div></td>
+        </tr>
+        <tr>
+            <td><label class="form-label" for="{{ form.customer_website.id_for_label }}">Website</label></td>
+            <td><div >{{ form.customer_website }}</div></td>
+
+            <td><label class="form-label" for="{{ form.phone2.id_for_label }}">Phone # 2</label></td>
+            <td><div >{{ form.phone2 }}</div></td>
+        
+        
+            
+        </tr>
+        <tr>
+            <td><label class="form-label" for="{{ form.opening_balance.id_for_label }}">Opening Balance</label></td>
+            <td><div >{{ form.opening_balance }}</div>    
+            <p>Enter amount in (-) for Debit</p>
+         
+              <td>
+              <td><div >
+                <button type="submit" class="btn btn-primary">Save Account</button>
+                 </div></td>
+          </tr>
+      </table>
+      
+      
+  </form>
+</div>
+{% else %}
+<div class="col-md-6 offset-md-3">
+  <a class="btn btn-primary" type="submit" aria-current="page" href="{% url 'login' %}"> Your are not Logged-in, Login first to perform this task.</a>
+</div>  
+{% endif %}
+      {% endblock %}
