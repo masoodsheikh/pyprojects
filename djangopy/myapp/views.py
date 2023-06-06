@@ -1,9 +1,12 @@
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import MainAccountForm, SubAccountForm
+from .forms import MainAccountForm, SubAccountForm, ProductForm
+from django.core.exceptions import ValidationError
+from .models import Product
 
 def home(request):
     return render(request, 'myapp/index.html')
@@ -60,12 +63,15 @@ def register(request):
 
 
 
+
 def add_main_account(request):
+
     if request.method == 'POST':
         form = MainAccountForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Account Successfully Added!")
+            
             return redirect('add_account')
     else:
         form = MainAccountForm()
@@ -73,10 +79,19 @@ def add_main_account(request):
     
     return render(request, 'myapp/add_account.html', {'form': form})
 
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.contrib import messages
+
+from .forms import SubAccountForm
+
+
+
 def add_sub_account(request):
     form=SubAccountForm()
     if request.method == 'POST':
         form = SubAccountForm(request.POST)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Account Successfully Added!")
@@ -86,3 +101,22 @@ def add_sub_account(request):
             return render(request, 'myapp/add_sub_account.html', {'form': form})
     
     return render(request, 'myapp/add_sub_account.html', {'form': form})
+
+
+
+
+
+def add_product(request):
+    form = ProductForm()
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            product_name = form.cleaned_data['product_name']
+            if Product.objects.filter(product_name=product_name).exists():
+                messages.error(request, "Product already exists. Please choose a different name.")
+            else:
+                form.save()
+                messages.success(request, "Product Successfully Added!")
+                return redirect('add_product')
+    
+    return render(request, 'myapp/add_product.html', {'form': form})
